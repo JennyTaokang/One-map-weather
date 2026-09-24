@@ -63,8 +63,14 @@ export default function App() {
         url += `?area=${encodeURIComponent(area)}`;
       }
       const res = await fetch(url);
-      if (!res.ok) throw new Error('Live weather data temporarily unavailable');
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('Weather service returned an unreadable response.');
+      }
+      if (!res.ok || data.error) throw new Error(data?.error || 'Live weather data temporarily unavailable');
       setCurrentWeather(data);
     } catch (err: any) {
       setWeatherError(err.message || 'Unable to retrieve Singapore 2-hour forecast');
@@ -94,10 +100,16 @@ export default function App() {
     try {
       const url = `/api/onemap-route?start=${start.lat},${start.lng}&end=${dest.lat},${dest.lng}&routeType=${mode}`;
       const res = await fetch(url);
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('Routing service returned an unreadable response. Please check points and try again.');
+      }
 
       if (!res.ok || data.status !== 0) {
-        throw new Error(data.status_message || 'Could not find a route between points.');
+        throw new Error(data.status_message || data.error || 'Could not find a route between points.');
       }
 
       setCurrentRoute(data);
@@ -171,10 +183,16 @@ export default function App() {
         }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('AI Assistant returned an unreadable response. Please retry.');
+      }
 
-      if (!res.ok) {
-        throw new Error(data.error || 'AI Assistant encountered an error.');
+      if (!res.ok || data?.error) {
+        throw new Error(data?.error || 'AI Assistant encountered an error.');
       }
 
       // Update application state if modified by agent

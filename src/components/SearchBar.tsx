@@ -48,8 +48,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
     try {
       const res = await fetch(`/api/onemap-search?searchVal=${encodeURIComponent(searchTerm)}`);
-      if (!res.ok) throw new Error('Search request failed');
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error('Search service returned an unreadable response');
+      }
+
+      if (!res.ok || data?.error) throw new Error(data?.error || 'Search request failed');
 
       if (data.results && data.results.length > 0) {
         setResults(data.results.slice(0, 7)); // Show top 7 relevant matches
