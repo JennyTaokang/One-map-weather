@@ -1,0 +1,6 @@
+{
+  "name": "Singapore Travel & Navigation Assistant",
+  "description": "Agentic Singapore travel assistant with OneMap search, directions, live 2-hour weather forecast, and interactive map.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
